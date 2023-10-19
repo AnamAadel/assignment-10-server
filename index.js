@@ -48,5 +48,78 @@ run().catch(console.dir);
 app.use(cors())
 app.use(express.json());
 
-const db = client.db("practiceDb").collection("users");
+const db = client.db("shopDb");
+const productCollection = db.collection("products");
 
+
+
+app.get("/products/all", async (req, res)=> {
+    const cursor = productCollection.find();
+    const productData = await cursor.toArray();
+    // console.log(productData)
+    res.send(productData);
+})
+
+app.get("/users/:id", async (req, res)=> {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const userData = await db.findOne(query);
+    // const userData = await cursor.toArray();
+    res.send(userData);
+})
+
+app.post("/users/current-user", async (req, res)=> {
+    const query = req.body;
+    // const query = {_id: new ObjectId(id)}
+    const userData = await db.findOne(query);
+    // const userData = await cursor.toArray();
+    console.log(query)
+    console.log(userData)
+    res.send(userData);
+})
+
+app.post("/users", async (req, res)=> {
+    console.log(req.body)
+
+    const user = req.body;
+
+    const result = await db.insertOne(user);
+    console.log(result);
+    
+    
+    res.send(result);
+})
+
+app.put("/users/:id", async (req, res)=> {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)};
+
+    const updatedData = {
+      $set: req.body,
+    };
+    // const updatedData = req.body;
+
+    console.log(updatedData)
+
+    const options = {upsert: true}
+
+    const result = await db.updateOne(query, updatedData, options);
+
+    console.log(result);
+    res.send(result)
+})
+
+
+app.delete("/users/:id", async (req, res)=> {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)};
+
+    const result = await db.deleteOne(query);
+
+    console.log(result);
+    res.send(result)
+})
+
+app.listen(port, () => {
+    console.log(`server listening on ${port}`)
+})
