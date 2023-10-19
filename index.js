@@ -51,6 +51,8 @@ app.use(express.json());
 const db = client.db("shopDb");
 const productCollection = db.collection("products");
 const brandCollection = db.collection("brandData");
+const newProductCollection = db.collection("heroProduct");
+const facilitiesCollection = db.collection("facilities");
 
 // create api to get all data
 
@@ -69,7 +71,31 @@ app.get("/brands/all", async (req, res)=> {
     res.send(brandData);
 })
 
-app.get("/users/:id", async (req, res)=> {
+// created api to get banner data
+app.get("/new_product/all", async (req, res)=> {
+    const cursor = newProductCollection.find();
+    const bannerData = await cursor.toArray();
+    // console.log(productData)
+    res.send(bannerData);
+})
+
+// created api to get banner data
+app.get("/facilities/all", async (req, res)=> {
+    const cursor = facilitiesCollection.find();
+    const facilitiesData = await cursor.toArray();
+    // console.log(productData)
+    res.send(facilitiesData);
+})
+
+app.get("/brands/:id", async (req, res)=> {
+    const id = req.params.id;
+    const query = {brand: id}
+    const cursor = await productCollection.find(query);
+    const userData = await cursor.toArray();
+    res.send(userData);
+})
+
+app.get("/products/:id", async (req, res)=> {
     const id = req.params.id;
     const query = {_id: new ObjectId(id)}
     const userData = await db.findOne(query);
